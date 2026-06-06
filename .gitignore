@@ -21,3 +21,4 @@ Thumbs.db
 
 # Build & Cache
 *.tsbuildinfo
+assets/model.glb
