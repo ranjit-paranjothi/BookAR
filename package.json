@@ -7,7 +7,9 @@
     "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
-    "deploy": "gh-pages -d public"
+    "predeploy": "cp -R assets public/assets",
+    "deploy": "gh-pages -d public",
+    "postdeploy": "node -e \"require('fs').rmSync('public/assets',{recursive:true,force:true})\""
   },
   "keywords": [
     "ar",
