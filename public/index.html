@@ -43,6 +43,7 @@
 
     <!-- Assets -->
     <a-assets>
+      <a-asset-item id="bull-head-model" src="assets/BullHead.glb"></a-asset-item>
       <video id="video-screen" autoplay loop muted playsinline preload="auto" style="display: none;">
         <source src="assets/promo.mp4" type="video/mp4">
         Your browser does not support the video tag.
@@ -55,13 +56,16 @@
 
     <!-- Target Image 1 -->
     <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
+      <!-- 3D Bull Head model, hidden until target detection -->
+      <a-gltf-model id="bull-head-entity" src="#bull-head-model" position="0 0 0" rotation="10 0 0" scale="0.5 0.5 0.5" visible="false"></a-gltf-model>
+
       <!-- Video Plane - positioned vertically above target (9:16 ratio) -->
       <!-- <a-plane position="0 1.5 0" rotation="90 0 0" scale="0.9 1.6 1" material="src: #video-screen; transparent: true;" id="video-plane"></a-plane> -->
 <!-- <a-plane position="0 1.4 0.009" rotation="90 0 0" scale="0.95 0.95 0.95" color="#FF0000"></a-plane> -->
 
        <!-- <a-plane position="0 1.4 0.01" rotation="90 0 0" scale="0.9 0.9 0.9" material="src: #video-screen; transparent: true;" id="video-plane"></a-plane>       -->
         <!-- Base plane: Acts as the CSS-styled background border -->
-    <a-plane color="#FFD700" rotation="0 0 0" position="0 -0.2 0" scale=".8 .8 .8">
+    <a-plane color="#FFD700" rotation="90 0 0" position="0 1.2 0" scale=".8 .8 .8">
       <!-- Video plane: Offset forward by 0.002 to kill z-fighting -->
       <a-video src="#video-screen" material="shader: flat;" rotation="0 0 0" position="0 0 0.002" scale="0.9 0.9 1"></a-video>
 
@@ -73,7 +77,6 @@
                   rotation="0 0 0">
           </a-text>
     </a-plane>
-      <!-- <a-gltf-model src="#model" visible="true" rotation ="90 0 0" position="0 1 0" scale="1 1 1"></a-gltf-model> -->
     </a-entity>
     
     
@@ -185,11 +188,11 @@
           console.log('✓ Video playing', { muted: videoElement.muted });
         }
 
-        // SHOW THE BOX MODEL WHEN DETECTED
-        const boxElement = document.querySelector('#model');
-        if (boxElement) {
-          boxElement.setAttribute('visible', 'true');
-          document.getElementById('status').textContent = '✓✓✓ BOX DETECTED! ✓✓✓';
+        // SHOW THE BullHead model WHEN DETECTED
+        const bullHeadEntity = document.querySelector('#bull-head-entity');
+        if (bullHeadEntity) {
+          bullHeadEntity.setAttribute('visible', 'true');
+          document.getElementById('status').textContent = '✓✓✓ BULL HEAD DETECTED! ✓✓✓';
         }
       });
       
@@ -202,6 +205,12 @@
         if (videoElement) {
           videoElement.pause();
           console.log('✓ Video paused');
+        }
+
+        // Hide BullHead model when the target is lost
+        const bullHeadEntity = document.querySelector('#bull-head-entity');
+        if (bullHeadEntity) {
+          bullHeadEntity.setAttribute('visible', 'false');
         }
       });
       
