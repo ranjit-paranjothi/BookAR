@@ -15,15 +15,24 @@ function initializeARScene() {
     return;
   }
 
+  // Get the 3D model entity
+  const bullModel = document.querySelector('#bull-model-entity');
+
   // Listen for target detection
   document.addEventListener('targetFound', (event) => {
     console.log('Target found!', event);
-    // Add custom logic here
+    if (bullModel) {
+      bullModel.setAttribute('visible', 'true');
+      console.log('Bull model now visible');
+    }
   });
 
   document.addEventListener('targetLost', (event) => {
     console.log('Target lost!', event);
-    // Add custom logic here
+    if (bullModel) {
+      bullModel.setAttribute('visible', 'false');
+      console.log('Bull model hidden');
+    }
   });
 
   // Setup scene interactions
