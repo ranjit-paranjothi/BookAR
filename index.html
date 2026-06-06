@@ -43,7 +43,7 @@
 
     <!-- Assets -->
     <a-assets>
-      <video id="video-screen" autoplay loop muted playsinline webkit-playsinline preload="auto" style="position:absolute; width:1px; height:1px; opacity:0; left:-9999px;">
+      <video id="video-screen" autoplay loop muted playsinline preload="auto" style="display: none;">
         <source src="assets/promo.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video>
@@ -147,26 +147,17 @@
         });
       }
       
+      // Auto-request camera permission on load
+      console.log('Auto-requesting camera permission...');
+      setTimeout(requestCameraPermission, 1000);
+      
       const scene = document.querySelector('a-scene');
-      
-      const videoElement = document.querySelector('#video-screen');
-      if (videoElement) {
-        videoElement.muted = true;
-        videoElement.playsInline = true;
-        videoElement.webkitPlaysInline = true;
-        videoElement.setAttribute('playsinline', '');
-        videoElement.setAttribute('webkit-playsinline', '');
-      }
-      
-      document.querySelector('video').style.border = '5px solid black';
-      
-      // Only request camera permission from an explicit user gesture
-      // rather than auto-starting playback on load.
-      
       if (!scene) {
         console.error('A-Frame scene not found!');
         return;
       }
+
+      document.querySelector('video').style.border = '5px solid black';
       
       // Log when mindar is ready
       scene.addEventListener('ready', () => {
