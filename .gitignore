@@ -3,3 +3,21 @@ dist/
 .DS_Store
 *.log
 assets/jallikattu.mp4
+
+# Security & Sensitive Files
+*.pem
+*.key
+*.env
+.env.local
+.env.*.local
+
+# IDE & Editor
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build & Cache
+*.tsbuildinfo
