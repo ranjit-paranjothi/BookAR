@@ -7,6 +7,22 @@
   <base href="./">
   <script src="https://unpkg.com/three@r128/build/three.min.js"></script>
   <script src="https://unpkg.com/aframe@1.4.2/dist/aframe-master.min.js"></script>
+  <script>
+    AFRAME.registerComponent('freeze-yz', {
+      schema: {
+        y: { type: 'number', default: 0 },
+        z: { type: 'number', default: 0 },
+        enabled: { type: 'boolean', default: false }
+      },
+      tick: function () {
+        if (!this.data.enabled) return;
+        const rot = this.el.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+        if (rot.y !== this.data.y || rot.z !== this.data.z) {
+          this.el.setAttribute('rotation', { x: rot.x, y: this.data.y, z: this.data.z });
+        }
+      }
+    });
+  </script>
   <script src="mindar-image-aframe.prod.js"></script>
 
   <style>
@@ -43,6 +59,7 @@
 
     <!-- Assets -->
     <a-assets>
+      <a-asset-item id="bull-model" src="assets/vaadivaasal_bull.glb"></a-asset-item>
       <video id="video-screen" autoplay loop muted playsinline preload="auto" style="display: none;">
         <source src="assets/promo.mp4" type="video/mp4">
         Your browser does not support the video tag.
@@ -55,13 +72,12 @@
 
     <!-- Target Image 1 -->
     <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-      <!-- Video Plane - positioned vertically above target (9:16 ratio) -->
-      <!-- <a-plane position="0 1.5 0" rotation="90 0 0" scale="0.9 1.6 1" material="src: #video-screen; transparent: true;" id="video-plane"></a-plane> -->
-<!-- <a-plane position="0 1.4 0.009" rotation="90 0 0" scale="0.95 0.95 0.95" color="#FF0000"></a-plane> -->
-
-       <!-- <a-plane position="0 1.4 0.01" rotation="90 0 0" scale="0.9 0.9 0.9" material="src: #video-screen; transparent: true;" id="video-plane"></a-plane>       -->
+      <!-- 3D Model - Vaadivaasal Bull (perpendicular to target, at top) -->
+      <a-gltf-model id="bull-model-entity" src="#bull-model" position="0.25 0.4 0.5" rotation="90 0 0" scale="0.7 0.7 0.7" visible="true"></a-gltf-model>
+      
+        <!-- Video Plane - positioned perpendicular to target at top -->
         <!-- Base plane: Acts as the CSS-styled background border -->
-    <a-plane color="#FFD700" rotation="0 0 0" position="0 -0.2 0" scale=".8 .8 .8">
+      <a-plane id="video-base-plane" color="#FFD700" rotation="90 0 0" position="0.25 0.4 1" scale=".6 .6 .6">
       <!-- Video plane: Offset forward by 0.002 to kill z-fighting -->
       <a-video src="#video-screen" material="shader: flat;" rotation="0 0 0" position="0 0 0.002" scale="0.9 0.9 1"></a-video>
 
@@ -73,7 +89,6 @@
                   rotation="0 0 0">
           </a-text>
     </a-plane>
-      <!-- <a-gltf-model src="#model" visible="true" rotation ="90 0 0" position="0 1 0" scale="1 1 1"></a-gltf-model> -->
     </a-entity>
     
     
@@ -191,6 +206,18 @@
           boxElement.setAttribute('visible', 'true');
           document.getElementById('status').textContent = '✓✓✓ BOX DETECTED! ✓✓✓';
         }
+
+        // Freeze Y and Z rotation of model and video plane at detection angle
+        const bull = document.querySelector('#bull-model-entity');
+        const videoPlane = document.querySelector('#video-base-plane');
+        if (bull) {
+          const r = bull.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+          bull.setAttribute('freeze-yz', { y: r.y, z: r.z, enabled: true });
+        }
+        if (videoPlane) {
+          const r = videoPlane.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+          videoPlane.setAttribute('freeze-yz', { y: r.y, z: r.z, enabled: true });
+        }
       });
       
       scene.addEventListener('targetLost', (event) => {
@@ -203,6 +230,12 @@
           videoElement.pause();
           console.log('✓ Video paused');
         }
+
+        // Disable freeze when target is lost
+        const bull = document.querySelector('#bull-model-entity');
+        const videoPlane = document.querySelector('#video-base-plane');
+        if (bull) bull.setAttribute('freeze-yz', { enabled: false });
+        if (videoPlane) videoPlane.setAttribute('freeze-yz', { enabled: false });
       });
       
       // Log errors
