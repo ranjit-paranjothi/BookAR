@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AR Application with mindAR & A-Frame</title>
+  <base href="./">
   <script src="https://unpkg.com/three@r128/build/three.min.js"></script>
   <script src="https://unpkg.com/aframe@1.4.2/dist/aframe-master.min.js"></script>
-  <script src="/mindar-image-aframe.prod.js"></script>
-  <script src="https://aframe.io"></script>
+  <script src="mindar-image-aframe.prod.js"></script>
 
   <style>
     body {
@@ -43,8 +43,8 @@
 
     <!-- Assets -->
     <a-assets>
-      <video id="video-screen" loop playsinline>
-        <source src="assets/jallikattu.mp4" type="video/mp4">
+      <video id="video-screen" autoplay loop muted playsinline preload="auto" style="display: none;">
+        <source src="assets/promo.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video>
     </a-assets>
@@ -63,7 +63,7 @@
         <!-- Base plane: Acts as the CSS-styled background border -->
     <a-plane color="#FFD700" rotation="0 0 0" position="0 -0.2 0" scale=".8 .8 .8">
       <!-- Video plane: Offset forward by 0.002 to kill z-fighting -->
-      <a-video src="#video-screen" rotation="0 0 0" position="0 0 0.002" scale="0.9 0.9 1"></a-video>
+      <a-video src="#video-screen" material="shader: flat;" rotation="0 0 0" position="0 0 0.002" scale="0.9 0.9 1"></a-video>
 
       <a-text value="T. Dharmaraj" 
                   color="#FFFFFF" 
@@ -86,6 +86,8 @@
   </div>
 
   <script>
+    let userGestureAllowed = false;
+
     // Request camera permission explicitly
     function requestCameraPermission() {
       console.log('Requesting camera permission...');
@@ -103,8 +105,20 @@
       })
         .then((stream) => {
           console.log('✓ Camera permission granted');
-          // document.getElementById('status').textContent = '✓ Camera Ready - Point at target';
           document.getElementById('cameraBtn').style.display = 'none';
+          userGestureAllowed = true;
+
+          const videoElement = document.querySelector('#video-screen');
+          if (videoElement) {
+            videoElement.muted = true;
+            videoElement.volume = 1;
+            videoElement.play().then(() => {
+              console.log('✓ Video autoplayed after camera permission');
+            }).catch((e) => {
+              console.warn('Video autoplay after camera permission failed:', e);
+            });
+          }
+
           // Don't stop the stream - keep it for mindar
         })
         .catch((error) => {
@@ -164,8 +178,11 @@
         // Play video when target is detected
         const videoElement = document.querySelector('#video-screen');
         if (videoElement) {
+          if (userGestureAllowed) {
+            videoElement.muted = false;
+          }
           videoElement.play().catch(e => console.error('Video play failed:', e));
-          console.log('✓ Video playing');
+          console.log('✓ Video playing', { muted: videoElement.muted });
         }
 
         // SHOW THE BOX MODEL WHEN DETECTED
