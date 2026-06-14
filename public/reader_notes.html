@@ -1532,6 +1532,10 @@ svg text {
   font-family: var(--font-sans, sans-serif);
 }
 .node-g { cursor: pointer; }
+.node-g text{ 
+    font-weight: bold;
+    font-size: 13px;
+ }
 .node-g:hover rect, .node-g:hover circle { opacity: 0.88; }
 #detail-panel {
   position: sticky;
@@ -1811,6 +1815,11 @@ function showDetail(idx) {
     el.style.opacity = (i === idx || idx === 0) ? '1' : '0.6';
   });
 }
+
+// Default to the main root node when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+  showDetail(0);
+});
 </script>
 
 
