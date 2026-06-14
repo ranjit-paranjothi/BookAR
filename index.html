@@ -46,6 +46,58 @@
       font-size: 12px;
       z-index: 100;
     }
+    #readerNotesBtn {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 200;
+      background: #286fb7;
+      color: #ffffff;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+    }
+    #readerNotesBtn:hover {
+      background: #1f5c95;
+    }
+    #diagram-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.96);
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      z-index: 500;
+      backdrop-filter: blur(12px);
+    }
+    #diagram-overlay.active {
+      display: flex;
+    }
+    #diagram-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.72);
+      color: #ffffff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 510;
+    }
+    #diagram-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      flex: 1;
+      border-radius: 0;
+    }
   </style>
 </head>
 <body>
@@ -99,6 +151,12 @@
     <p id="status"></p>
     <button id="cameraBtn" style="margin-top: 10px; padding: 10px 20px; background: #4ECDC4; color: white; border: none; border-radius: 5px; cursor: pointer;">Enable Camera</button>
   </div>
+  <button id="readerNotesBtn">Reader's Notes</button>
+
+  <div id="diagram-overlay" aria-hidden="true">
+    <button id="diagram-close-btn" aria-label="Close diagram">×</button>
+    <iframe id="diagram-frame" src="reader_notes.html"></iframe>
+  </div>
 
   <script>
     let userGestureAllowed = false;
@@ -149,16 +207,24 @@
       
       const statusDiv = document.getElementById('status');
       const cameraBtn = document.getElementById('cameraBtn');
+      const readerNotesButton = document.getElementById('readerNotesBtn');
       
       if (statusDiv) {
         // statusDiv.textContent = 'Click "Enable Camera" to start';
       }
       
-      // Add click handler to button
+      // Add click handler to buttons
       if (cameraBtn) {
         cameraBtn.addEventListener('click', () => {
           console.log('User clicked enable camera');
           requestCameraPermission();
+        });
+      }
+
+      if (readerNotesButton) {
+        readerNotesButton.addEventListener('click', () => {
+          console.log('Reader notes button clicked');
+          showDiagramOverlay();
         });
       }
       
@@ -199,6 +265,7 @@
           videoElement.play().catch(e => console.error('Video play failed:', e));
           console.log('✓ Video playing', { muted: videoElement.muted });
         }
+        document.getElementById('status').textContent = '✓✓✓ COVER DETECTED! Click the Reader notes button above.';
 
         // SHOW THE BOX MODEL WHEN DETECTED
         const boxElement = document.querySelector('#model');
@@ -243,6 +310,27 @@
         console.error('Scene error:', e);
         document.getElementById('status').textContent = '✗ AR Error';
       });
+    });
+
+    function showDiagramOverlay() {
+      const overlay = document.getElementById('diagram-overlay');
+      if (!overlay) return;
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function hideDiagramOverlay() {
+      const overlay = document.getElementById('diagram-overlay');
+      if (!overlay) return;
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const closeBtn = document.getElementById('diagram-close-btn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', hideDiagramOverlay);
+      }
     });
   </script>
 </body>
